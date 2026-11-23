@@ -49,6 +49,15 @@ jobs:
           print("Prueba de inferencia exitosa:", datos)
           PY
 
+      - name: Medir latencia de inferencia
+        run: python3 tests/test_latency.py
+
+      - name: Guardar reporte de latencia
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-latencia
+          path: latencia_ci.json
       - name: Mostrar errores del contenedor
         if: failure()
         run: docker logs frutas-api-ci || true
+
