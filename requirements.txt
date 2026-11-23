@@ -1,0 +1,6 @@
+ultralytics==8.4.216
+onnxruntime==1.32.0
+fastapi==0.165.0
+uvicorn==0.54.0
+python-multipart==0.0.34
+Pillow==13.0.0

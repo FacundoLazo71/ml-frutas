@@ -1,0 +1,11 @@
+﻿.venv/
+__pycache__/
+.pytest_cache/
+datos/
+resultados/
+pruebas/
+runs/
+*.zip
+*.pt
+.env
+.env.*

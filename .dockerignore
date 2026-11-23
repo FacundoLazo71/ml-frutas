@@ -1,0 +1,12 @@
+.venv/
+datos/
+resultados/
+pruebas/
+runs/
+__pycache__/
+.git/
+.env
+.env.*
+*.zip
+*.ipynb
+modelo/*.pt

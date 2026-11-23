@@ -1,0 +1,54 @@
+﻿name: CI - Detector de Frutas
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Construir imagen Docker
+        run: docker build -t frutas-eva4:ci .
+
+      - name: Ejecutar contenedor
+        run: docker run -d --name frutas-api-ci -p 8000:8000 frutas-eva4:ci
+
+      - name: Comprobar funcionamiento
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8000/health; then
+              exit 0
+            fi
+            sleep 3
+          done
+          docker logs frutas-api-ci
+          exit 1
+
+      - name: Probar inferencia
+        run: |
+          curl -fsS \
+            -F "file=@tests/test_image.png;type=image/png" \
+            http://127.0.0.1:8000/predict \
+            -o respuesta.json
+
+          python3 - <<'PY'
+          import json
+          with open("respuesta.json", encoding="utf-8") as f:
+              datos = json.load(f)
+          assert datos["total_detecciones"] == len(datos["detecciones"])
+          assert datos["tiempo_inferencia_ms"] >= 0
+          print("Prueba de inferencia exitosa:", datos)
+          PY
+
+      - name: Mostrar errores del contenedor
+        if: failure()
+        run: docker logs frutas-api-ci || true
